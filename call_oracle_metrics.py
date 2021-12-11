@@ -110,6 +110,17 @@ class database:
                 cursor.close()
                 print("# Connection ? deleted", answer)
 
+class callTelegraf():
+    def runALL():
+        with sqlite3.connect(inventorydb) as conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT id, dsn, user, password, instance from connections')
+            print("# Registered Connections:")
+            for row in cursor.fetchall():
+                print("## ID=" + str(row[0]) + ": " + row[2] + crypto.salt_decode(row[3]) + row[1] + "/" + row[4]) ## há aqui um erro qq 
+                # CALL Ficheiro de execução, import, o que quiseres
+        return(1)
+
 
 ############################################### FUNCTIONS USAGE #########################################################################
 
@@ -131,6 +142,7 @@ class database:
 
 ############### RUN
 
+print(callTelegraf.runALL())
 
 
 
