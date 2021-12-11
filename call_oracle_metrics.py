@@ -71,7 +71,8 @@ class database:
                     (id, dsn, user, password, instance) 
                     VALUES
                     (?, ?, ?, ?, ?);"""
-            dataTuple = (newid, db_dsn,db_user,db_password,db_instance)
+            db_password_crypto = crypto.salt_encode(db_password)
+            dataTuple = (newid, db_dsn,db_user,db_password_crypto,db_instance)
             cursor.execute(insrt, dataTuple)
             conn.commit()
 
@@ -110,23 +111,13 @@ class database:
                 print("# Connection ? deleted", answer)
 
 
-       
-    # read from db w/salt
-    # read and export data to screen /no salt
-    # upsert /w salt
-    # delete /w salt
-
-# call external py /w read /w salt
-    # read from db w/salt
-    # call data
-
-
+############################################### FUNCTIONS USAGE #########################################################################
 
 ## saltfile usage
 # cria_saltfile = crypto.create_saltfile()
 # read_saltexpr = crypto.read_saltword()
 # print(crypto.salt_encode('bananas123'))
-print(crypto.salt_decode("gAAAAABhs_aM9V-eisDLEZeWdnfiGRU3UOFaCR2IOFzdISH9vAwrjNdDemAwfNBLs1TrqAjDDvTVPxwF1dfwzowpwq-916hBqg=="))
+# print(crypto.salt_decode("gAAAAABhs_aM9V-eisDLEZeWdnfiGRU3UOFaCR2IOFzdISH9vAwrjNdDemAwfNBLs1TrqAjDDvTVPxwF1dfwzowpwq-916hBqg=="))
 
 ## database usage
 # cria_database = database.create_database()
@@ -135,3 +126,11 @@ print(crypto.salt_decode("gAAAAABhs_aM9V-eisDLEZeWdnfiGRU3UOFaCR2IOFzdISH9vAwrjN
 
 
 ## run(ALL)
+# criar argumentos para executar: setup (create database, add e del connections) | saltfile create, read, encode, decode | run_all
+
+
+############### RUN
+
+
+
+
