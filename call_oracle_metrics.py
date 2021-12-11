@@ -145,4 +145,4 @@ class callTelegraf():
 print(callTelegraf.runALL())
 
 
-
+# quanto estiver OK: compilar/empacotar para um ficheiro único e executável e sem precisar de dependências python
