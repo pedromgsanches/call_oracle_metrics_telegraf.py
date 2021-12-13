@@ -135,7 +135,7 @@ class callTelegraf():
                 #print("## ID=" + str(row[0]) + ": " + row[2] + '/' + crypto.salt_decode(row[3]) + '@' + row[1] + "/" + row[4])
                 #python3 "$SCRIPT" --dsn "$DSN" --user "$USER" --password "$PASSWORD" --instance "$INSTANCE"
                 exec_command = "nohup " + script_file + " --dsn " + row[1] + " --user " + row[2] + " --password " + crypto.salt_decode(row[3]) + " --instance " + row[4] + " & 2>/dev/null"
-                print(exec_command)
+                # print(exec_command) ## descomentar apenas para debug
                 os.system(exec_command)
         return(1)
 
