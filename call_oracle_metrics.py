@@ -133,30 +133,11 @@ class callTelegraf():
             print("# Registered Connections:")
             for row in cursor.fetchall():
                 #print("## ID=" + str(row[0]) + ": " + row[2] + '/' + crypto.salt_decode(row[3]) + '@' + row[1] + "/" + row[4])
-                # CALL Ficheiro de execução, import, o que quiseres
                 #python3 "$SCRIPT" --dsn "$DSN" --user "$USER" --password "$PASSWORD" --instance "$INSTANCE"
                 exec_command = script_file + " --dsn " + row[1] + " --user " + row[2] + " --password " + crypto.salt_decode(row[3]) + " --instance " + row[4] 
                 #print(exec_command)
                 os.system(exec_command)
         return(1)
-
-
-############################################### FUNCTIONS USAGE #########################################################################
-
-## saltfile usage
-# cria_saltfile = crypto.create_saltfile()
-# read_saltexpr = crypto.read_saltword()
-# print(crypto.salt_encode('bananas123'))
-#print(crypto.salt_decode("gAAAAABhs_aM9V-eisDLEZeWdnfiGRU3UOFaCR2IOFzdISH9vAwrjNdDemAwfNBLs1TrqAjDDvTVPxwF1dfwzowpwq-916hBqg=="))
-
-### database usage
-# database.create_database()
-# database.add_connection('prdserver:1521','gamesapp','passwordprd','instance10')
-# database.del_connection()
-# database.list_connection()
-
-## run(ALL)
-# print(callTelegraf.runALL())
 
 
 argumentList = sys.argv[1:]
@@ -203,4 +184,20 @@ except getopt.error as err:
 
 print("-")
 
-            
+
+############################################### FUNCTIONS USAGE #########################################################################
+
+## saltfile usage
+# cria_saltfile = crypto.create_saltfile()
+# read_saltexpr = crypto.read_saltword()
+# print(crypto.salt_encode('bananas123'))
+#print(crypto.salt_decode("gAAAAABhs_aM9V-eisDLEZeWdnfiGRU3UOFaCR2IOFzdISH9vAwrjNdDemAwfNBLs1TrqAjDDvTVPxwF1dfwzowpwq-916hBqg=="))
+
+### database usage
+# database.create_database()
+# database.add_connection('prdserver:1521','gamesapp','passwordprd','instance10')
+# database.del_connection()
+# database.list_connection()
+
+## run(ALL)
+# print(callTelegraf.runALL())
