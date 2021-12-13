@@ -1,3 +1,7 @@
+# This file was taken from: bonitoo-io/telegraf-input-oracle
+# I hope I can add to the original repo.
+
+
 import argparse
 import cx_Oracle
 import re
