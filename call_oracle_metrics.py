@@ -1,7 +1,7 @@
 import sqlite3, os, os.path, getopt, sys
 from cryptography.fernet import Fernet
 
-script_file = "./oracle_metrics.py"
+script_file = "./python3 oracle_metrics.py"
 # SQLite catálogo
 inventorydb = "./inventory.db"
 # Ficheiro escondido com a chave de desencriptação das passwords
@@ -134,8 +134,8 @@ class callTelegraf():
             for row in cursor.fetchall():
                 #print("## ID=" + str(row[0]) + ": " + row[2] + '/' + crypto.salt_decode(row[3]) + '@' + row[1] + "/" + row[4])
                 #python3 "$SCRIPT" --dsn "$DSN" --user "$USER" --password "$PASSWORD" --instance "$INSTANCE"
-                exec_command = script_file + " --dsn " + row[1] + " --user " + row[2] + " --password " + crypto.salt_decode(row[3]) + " --instance " + row[4] 
-                #print(exec_command)
+                exec_command = "nohup " + script_file + " --dsn " + row[1] + " --user " + row[2] + " --password " + crypto.salt_decode(row[3]) + " --instance " + row[4] + " & 2>/dev/null"
+                print(exec_command)
                 os.system(exec_command)
         return(1)
 
