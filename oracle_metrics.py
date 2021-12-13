@@ -1,5 +1,5 @@
 # This file was taken from: bonitoo-io/telegraf-input-oracle
-# I hope I can add to the original repo.
+# I hope I can contribute to the original repo.
 
 
 import argparse
