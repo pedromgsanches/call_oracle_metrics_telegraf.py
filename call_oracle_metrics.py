@@ -1,7 +1,10 @@
-import sqlite3, os.path
+import sqlite3, os, os.path, getopt, sys
 from cryptography.fernet import Fernet
 
+script_file = "./oracle_metrics.py"
+# SQLite catálogo
 inventorydb = "./inventory.db"
+# Ficheiro escondido com a chave de desencriptação das passwords
 saltfile = "./.saltfile"
 
 # Salt File
@@ -19,7 +22,7 @@ class crypto:
             # Existe, confirma e escreve ou sai
             answer = 0
             while answer not in ["y","n"]:
-                answer = input("# 'saltfile' file exists. Replace? (y/n) ")
+                answer = input("## WARNING ## \n This will invalidate existing saved passwords! \n 'saltfile' file exists. Replace? (y/n)")
             if answer == "y":
                 crypto.saltwrite(key.decode("utf-8"))
                 print("# 'saltfile' replaced!") # esmaga ficheiro
@@ -44,7 +47,8 @@ class crypto:
     def salt_decode(str_to_decode):
         salt_wd = crypto.read_saltword()
         fernetw = Fernet(salt_wd)
-        dec_pwd = fernetw.decrypt(str.encode(str_to_decode)).decode()
+#       dec_pwd = fernetw.decrypt(str.encode(str_to_decode)).decode()
+        dec_pwd = fernetw.decrypt(str_to_decode).decode()
         return(dec_pwd)
 
 # SQLite database class
@@ -83,6 +87,17 @@ class database:
             cursor.close()
         return(newid)
 
+    def list_connection():
+        with sqlite3.connect(inventorydb) as conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT id, dsn, user, instance from connections')
+            print("# Registered Connections:")
+            idList = []
+            for row in cursor.fetchall():
+                print("## ID=" + str(row[0]) + ": " + row[2] + "/******@" + row[1] + "/" + row[3])
+                idList.append(int(row[0]))    
+            cursor.close()
+
     def del_connection():
         with sqlite3.connect(inventorydb) as conn:
             cursor = conn.cursor()
@@ -117,8 +132,12 @@ class callTelegraf():
             cursor.execute('SELECT id, dsn, user, password, instance from connections')
             print("# Registered Connections:")
             for row in cursor.fetchall():
-                print("## ID=" + str(row[0]) + ": " + row[2] + crypto.salt_decode(row[3]) + row[1] + "/" + row[4]) ## há aqui um erro qq 
+                #print("## ID=" + str(row[0]) + ": " + row[2] + '/' + crypto.salt_decode(row[3]) + '@' + row[1] + "/" + row[4])
                 # CALL Ficheiro de execução, import, o que quiseres
+                #python3 "$SCRIPT" --dsn "$DSN" --user "$USER" --password "$PASSWORD" --instance "$INSTANCE"
+                exec_command = script_file + " --dsn " + row[1] + " --user " + row[2] + " --password " + crypto.salt_decode(row[3]) + " --instance " + row[4] 
+                #print(exec_command)
+                os.system(exec_command)
         return(1)
 
 
@@ -128,21 +147,60 @@ class callTelegraf():
 # cria_saltfile = crypto.create_saltfile()
 # read_saltexpr = crypto.read_saltword()
 # print(crypto.salt_encode('bananas123'))
-# print(crypto.salt_decode("gAAAAABhs_aM9V-eisDLEZeWdnfiGRU3UOFaCR2IOFzdISH9vAwrjNdDemAwfNBLs1TrqAjDDvTVPxwF1dfwzowpwq-916hBqg=="))
+#print(crypto.salt_decode("gAAAAABhs_aM9V-eisDLEZeWdnfiGRU3UOFaCR2IOFzdISH9vAwrjNdDemAwfNBLs1TrqAjDDvTVPxwF1dfwzowpwq-916hBqg=="))
 
-## database usage
-# cria_database = database.create_database()
-# add_connectio = database.add_connection('qlyserver:1521','gamesapp','passwordqly','instanceX')
-# del_connectio = database.del_connection()
-
+### database usage
+# database.create_database()
+# database.add_connection('prdserver:1521','gamesapp','passwordprd','instance10')
+# database.del_connection()
+# database.list_connection()
 
 ## run(ALL)
-# criar argumentos para executar: setup (create database, add e del connections) | saltfile create, read, encode, decode | run_all
+# print(callTelegraf.runALL())
 
 
-############### RUN
+argumentList = sys.argv[1:]
+options = "hslcdxa:"
+long_options = ["help", "salt","list", "create-db", "del-target", "execute", "add-target"]
 
-print(callTelegraf.runALL())
+print("-")
+print("###### Run Oracle Metrics ###################################")
+print("# Try ./call_oracle_metrics -h for help about using me")
+try:
+    # Parsing argument
+    arguments, values = getopt.getopt(argumentList, options, long_options)
+    # checking each argument
+    for currentArgument, currentValue in arguments:
+ 
+        if currentArgument in ("-h", "--help"):
+            print (
+                "Run Oracle Metrics Help: \n" 
+                "    -h, --help                                                    - show this dialog \n"
+                "    -l, --list                                                    - list connections \n"
+                "    -s, --salt                                                    - create saltfile for password encryption \n"
+                "    -c, --create-db                                               - Create database for targets inventory \n"
+                "    -a, --add-target dsn user password instance-name              - Add target to database. Example: \n"
+                "                                                                    ./call_oracle_metrics -a xapp-prod:1521 xapp_user Passw0rd666 instance01 \n"        
+                "    -d, --del-target                                              - Delete target from database \n"
+                "    -x,  --execute                                                - Run Oracle Metrics" )
+             
+        elif currentArgument in ("-s", "--salt"):
+            exec = crypto.create_saltfile()
+        elif currentArgument in ("-c", "--create-db"):
+            exec = database.create_database()
+        elif currentArgument in ("-l", "--list"):
+            exec = database.list_connection()
+        elif currentArgument in ("-a", "--add-target"):
+            exec = database.add_connection(sys.argv[2],sys.argv[3],sys.argv[4], sys.argv[5])
+            #exec = database.add_connection('prdserver:1521','gamesapp','passwordprd','instance10')
+        elif currentArgument in ("-d", "--del-target"):
+            exec = database.del_connection()         
+        elif currentArgument in ("-x", "--execute"):
+            exec = callTelegraf.runALL()                 
+except getopt.error as err:
+    # output error, and return with an error code
+    print (str(err))
 
+print("-")
 
-# quanto estiver OK: compilar/empacotar para um ficheiro único e executável e sem precisar de dependências python
+            
