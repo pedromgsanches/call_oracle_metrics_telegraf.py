@@ -120,7 +120,7 @@ class database:
                 print("# Ok, buBye!")
             elif yesno == "y":
                 cursor = conn.cursor()
-                cursor.execute('DELETE FROM connections where id = ?;', answer)
+                cursor.execute('DELETE FROM connections where id = ?;', [answer])
                 conn.commit()
                 cursor.close()
                 print("# Connection ? deleted", answer)
@@ -144,7 +144,6 @@ argumentList = sys.argv[1:]
 options = "hslcdxa:"
 long_options = ["help", "salt","list", "create-db", "del-target", "execute", "add-target"]
 
-print("-")
 print("###### Run Oracle Metrics ###################################")
 print("# Try ./call_oracle_metrics -h for help about using me")
 try:
@@ -181,8 +180,6 @@ try:
 except getopt.error as err:
     # output error, and return with an error code
     print (str(err))
-
-print("-")
 
 
 ############################################### FUNCTIONS USAGE #########################################################################
